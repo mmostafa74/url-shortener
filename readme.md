@@ -12,6 +12,7 @@ A minimalist and production-ready URL shortener built with Go, SQLite, and HTML.
 - 💡 Clean and responsive frontend with copy-to-clipboard
 - 🐳 Dockerized with persistent volume support
 - 🔐 URL validation to prevent malformed input
+- ⚙️ GitHub Actions CI pipeline for build checks
 
 ---
 
