@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Go URL Shortener</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f5f7fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 1rem;
+      font-size: 1.8rem;
+      color: #333;
+    }
+
+    input[type="text"] {
+      padding: 12px;
+      margin: 10px 0;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border 0.2s ease-in-out;
+    }
+
+    input[type="text"]:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      padding: 12px;
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease-in-out;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .short-url {
+      margin-top: 1.5rem;
+      font-size: 1.1rem;
+      color: #28a745;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .short-url a {
+      color: #28a745;
+      font-weight: 500;
+      text-decoration: none;
+      margin-right: 10px;
+    }
+
+    .short-url button {
+      width: auto;
+      padding: 6px 10px;
+      font-size: 0.9rem;
+      background: #28a745;
+    }
+
+    .short-url button:hover {
+      background: #1e7e34;
+    }
+
+    .error {
+      color: #dc3545;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>URL Shortener</h1>
+    <input type="text" id="urlInput" placeholder="Enter a long URL">
+    <input type="text" id="aliasInput" placeholder="Optional custom alias (e.g. hello)">
+    <button onclick="shortenUrl()">Shorten URL</button>
+
+    <div class="short-url" id="result">
+      <span id="shortUrlText"></span>
+      <button id="copyBtn" onclick="copyToClipboard()">Copy</button>
+    </div>
+
+    <div class="error" id="error"></div>
+  </div>
+
+  <script>
+    async function shortenUrl() {
+      const url = document.getElementById("urlInput").value.trim();
+      const alias = document.getElementById("aliasInput").value.trim();
+      const resultDiv = document.getElementById("result");
+      const errorDiv = document.getElementById("error");
+
+      resultDiv.style.display = "none";
+      errorDiv.textContent = "";
+
+      if (!url) {
+        errorDiv.textContent = "Please enter a valid URL.";
+        return;
+      }
+
+      const body = alias ? { url, alias } : { url };
+
+      try {
+        const response = await fetch("/shorten", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(body)
+        });
+
+        const text = await response.text();
+
+        if (response.ok) {
+          const data = JSON.parse(text);
+          document.getElementById("shortUrlText").innerHTML = `<a href="${data.short_url}" target="_blank">${data.short_url}</a>`;
+          resultDiv.style.display = "flex";
+        } else {
+          errorDiv.textContent = text;
+        }
+      } catch (err) {
+        errorDiv.textContent = "Something went wrong. Please try again.";
+      }
+    }
+
+    function copyToClipboard() {
+      const text = document.getElementById("shortUrlText").textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById("copyBtn");
+        btn.textContent = "Copied!";
+        setTimeout(() => (btn.textContent = "Copy"), 2000);
+      });
+    }
+  </script>
+</body>
+
+</html>
