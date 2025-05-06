@@ -38,7 +38,7 @@ A minimalist and production-ready URL shortener built with Go, SQLite, and HTML.
 ```bash
 git clone https://github.com/mmostafa74/url-shortener
 cd url-shortener
-go run main.go
+go run .
 ```
 
 Visit: [http://localhost:8081](http://localhost:8081)
