@@ -3,168 +3,929 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Go URL Shortener</title>
+  <title>Go URL Shortener - Fast & Secure</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔗</text></svg>">
   <style>
+    :root {
+      --primary-color: #007bff;
+      --primary-hover: #0056b3;
+      --secondary-color: #28a745;
+      --secondary-hover: #1e7e34;
+      --error-color: #ff6b6b;
+      --success-color: #28a745;
+      --text-primary: #333;
+      --text-secondary: #666;
+      --text-muted: #999;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8f9fa;
+      --border-color: #dee2e6;
+      --border-radius: 8px;
+      --border-radius-lg: 12px;
+      --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.2);
+      --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
     * {
       box-sizing: border-box;
     }
 
     body {
-      background: #f5f7fa;
+      background: var(--gradient-primary);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
       margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      color: var(--text-primary);
+      line-height: 1.6;
     }
 
     .container {
-      background: #fff;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      background: var(--bg-primary);
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
       width: 100%;
-      max-width: 500px;
-      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+      min-height: calc(100vh - 40px);
+      display: flex;
+      flex-direction: column;
     }
 
-    h1 {
-      margin-bottom: 1rem;
-      font-size: 1.8rem;
-      color: #333;
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
     }
 
-    input[type="text"] {
-      padding: 12px;
-      margin: 10px 0;
-      width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: border 0.2s ease-in-out;
-    }
-
-    input[type="text"]:focus {
-      border-color: #007bff;
-      outline: none;
-    }
-
-    button {
-      background: #007bff;
-      color: white;
-      padding: 12px;
-      width: 100%;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.3s ease-in-out;
-    }
-
-    button:hover {
-      background: #0056b3;
-    }
-
-    .short-url {
-      margin-top: 1.5rem;
-      font-size: 1.1rem;
-      color: #28a745;
-      display: none;
+    .header {
+      display: flex;
+      justify-content: space-between;
       align-items: center;
+      padding: 2rem 2rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .logo-icon {
+      font-size: 2rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .nav-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: var(--border-radius);
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+      background: var(--bg-secondary);
+      color: var(--primary-color);
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 2rem;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .hero-title {
+      font-size: 3rem;
+      margin: 0 0 1rem 0;
+      font-weight: 800;
+    }
+
+    .gradient-text {
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .url-form {
+      max-width: 500px;
+      margin: 0 auto 3rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border-color);
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .form-hint {
+      display: block;
+      margin-top: 0.25rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 12px 24px;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: var(--secondary-color);
+      color: white;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--secondary-hover);
+      transform: translateY(-2px);
+    }
+
+    .btn-large {
+      width: 100%;
+      padding: 16px 24px;
+      font-size: 1.1rem;
       justify-content: center;
     }
 
-    .short-url a {
-      color: #28a745;
-      font-weight: 500;
-      text-decoration: none;
-      margin-right: 10px;
-    }
-
-    .short-url button {
-      width: auto;
-      padding: 6px 10px;
+    .btn-copy {
+      background: var(--secondary-color);
+      color: white;
+      padding: 8px 16px;
       font-size: 0.9rem;
-      background: #28a745;
     }
 
-    .short-url button:hover {
-      background: #1e7e34;
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 0.8rem;
     }
 
-    .error {
-      color: #dc3545;
-      margin-top: 1rem;
+    .result-section {
+      display: none;
+      max-width: 500px;
+      margin: 0 auto 2rem;
+    }
+
+    .result-card {
+      background: var(--bg-secondary);
+      border-radius: var(--border-radius-lg);
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .result-title {
+      margin: 0 0 1rem 0;
+      color: var(--success-color);
+      font-size: 1.2rem;
+    }
+
+    .short-url-display {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .url-text {
+      flex: 1;
+      padding: 0.5rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+      word-break: break-all;
+    }
+
+    .url-text a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .result-info {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .error-section {
+      display: none;
+      max-width: 500px;
+      margin: 0 auto 2rem;
+    }
+
+    .error-card {
+      background: #fff5f5;
+      border: 1px solid #fed7d7;
+      border-radius: var(--border-radius);
+      padding: 1rem;
+      color: var(--error-color);
+      text-align: center;
+    }
+
+    .recent-urls-section {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      background: var(--bg-secondary);
+      border-radius: var(--border-radius-lg);
+    }
+
+    .recent-urls-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .recent-urls-title {
+      margin: 0;
+      color: var(--text-primary);
+      font-size: 1.3rem;
+    }
+
+    .auto-refresh-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .auto-refresh-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .auto-refresh-checkbox {
+      margin: 0;
+    }
+
+    .url-item {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-left: 4px solid var(--primary-color);
+      transition: all 0.3s ease;
+    }
+
+    .url-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .url-item.expired {
+      border-left-color: var(--error-color);
+      background: #fff5f5;
+    }
+
+    .url-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.5rem;
+    }
+
+    .url-item-short {
+      font-family: monospace;
+      font-weight: 600;
+      color: var(--primary-color);
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .url-item-short:hover {
+      text-decoration: underline;
+    }
+
+    .url-item-status {
+      font-size: 0.8rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .status-active {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-expired {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .url-item-original {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+      word-break: break-all;
+    }
+
+    .url-item-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .progress-container {
+      flex: 1;
+      margin: 0 1rem;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background-color: #e9ecef;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background-color: var(--success-color);
+      transition: width 0.3s ease;
+      border-radius: 3px;
+    }
+
+    .progress-fill.warning {
+      background-color: #ffc107;
+    }
+
+    .progress-fill.danger {
+      background-color: var(--error-color);
+    }
+
+    .no-urls {
+      text-align: center;
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+    }
+
+    .features-section {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: var(--text-primary);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feature-card {
+      text-align: center;
+      padding: 1.5rem;
+      background: var(--bg-secondary);
+      border-radius: var(--border-radius-lg);
+      transition: transform 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .feature-card h3 {
+      margin: 0 0 0.5rem 0;
+      color: var(--text-primary);
+    }
+
+    .feature-card p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .footer {
+      padding: 1.5rem 2rem;
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      text-align: center;
+    }
+
+    .stats {
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .footer-text {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .emoji {
+      font-size: 1.2em;
+      margin: 0 0.2rem;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+
+      .hero-title {
+        font-size: 2.5rem;
+      }
+
+      .main-content {
+        padding: 1.5rem;
+      }
+
+      .short-url-display {
+        flex-direction: column;
+      }
+
+      .btn-copy {
+        width: 100%;
+      }
+
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .recent-urls-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+      }
+
+      .auto-refresh-controls {
+        justify-content: center;
+      }
+
+      .url-item-header {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .url-item-stats {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: stretch;
+      }
+
+      .progress-container {
+        margin: 0;
+      }
     }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <h1>URL Shortener</h1>
-    <input type="text" id="urlInput" placeholder="Enter a long URL">
-    <input type="text" id="aliasInput" placeholder="Optional custom alias (e.g. hello)">
-    <button onclick="shortenUrl()">Shorten URL</button>
-
-    <div class="short-url" id="result">
-      <span id="shortUrlText"></span>
-      <button id="copyBtn" onclick="copyToClipboard()">Copy</button>
+    <div class="header">
+      <div class="logo">
+        <span class="logo-icon">🔗</span>
+        <span class="logo-text">URL Shortener</span>
+      </div>
+      <div class="nav-links">
+        <a href="/health" class="nav-link">Status</a>
+        <a href="#features" class="nav-link">Features</a>
+      </div>
     </div>
 
-    <div class="error" id="error"></div>
-  </div>
+    <div class="main-content">
+      <div class="hero">
+        <h1 class="hero-title">
+          <span class="gradient-text">Shorten URLs</span>
+          <br>with Style
+        </h1>
+        <p class="hero-subtitle">
+          Fast, secure, and temporary. Each URL works for exactly 5 clicks.
+        </p>
+      </div>
 
-  <script>
-    async function shortenUrl() {
-      const url = document.getElementById("urlInput").value.trim();
-      const alias = document.getElementById("aliasInput").value.trim();
-      const resultDiv = document.getElementById("result");
-      const errorDiv = document.getElementById("error");
+      <div class="url-form">
+        <div class="form-group">
+          <label for="urlInput" class="form-label">
+            <span class="emoji">🌐</span>
+            Enter your long URL
+          </label>
+          <input type="text" id="urlInput" class="form-input" placeholder="https://example.com/very/long/url/here"
+            autocomplete="url">
+        </div>
 
-      resultDiv.style.display = "none";
-      errorDiv.textContent = "";
+        <div class="form-group">
+          <label for="aliasInput" class="form-label">
+            <span class="emoji">✨</span>
+            Custom alias (optional)
+          </label>
+          <input type="text" id="aliasInput" class="form-input" placeholder="my-custom-link" autocomplete="off">
+          <small class="form-hint">Leave empty for random alias</small>
+        </div>
 
-      if (!url) {
-        errorDiv.textContent = "Please enter a valid URL.";
-        return;
-      }
+        <button onclick="shortenUrl()" class="btn btn-primary btn-large" id="shortenBtn">
+          <span class="emoji">🚀</span>
+          <span class="btn-text">Shorten URL</span>
+        </button>
+      </div>
 
-      const body = alias ? { url, alias } : { url };
+      <div class="result-section" id="result">
+        <div class="result-card">
+          <h3 class="result-title">
+            <span class="emoji">🎉</span>
+            Your short URL is ready!
+          </h3>
+          <div class="short-url-display">
+            <div class="url-text" id="shortUrlText"></div>
+            <button class="btn btn-copy" id="copyBtn" onclick="copyToClipboard()">
+              <span class="emoji">📋</span>
+              Copy
+            </button>
+          </div>
+          <div class="result-info">
+            <span class="emoji">⏰</span>
+            Valid for 5 clicks only
+          </div>
+        </div>
+      </div>
 
-      try {
-        const response = await fetch("/shorten", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(body)
-        });
+      <div class="error-section" id="error">
+        <div class="error-card">
+          <span class="emoji">⚠️</span>
+          <span class="error-text" id="errorText"></span>
+        </div>
+      </div>
 
-        const text = await response.text();
+      <div class="recent-urls-section" id="recentUrlsSection" style="display: none;">
+        <div class="recent-urls-header">
+          <h3 class="recent-urls-title">
+            <span class="emoji">📊</span>
+            Recent URLs
+          </h3>
+          <div class="auto-refresh-controls">
+            <label class="auto-refresh-label">
+              <input type="checkbox" id="autoRefreshCheckbox" class="auto-refresh-checkbox" checked>
+              <span>Auto-refresh</span>
+            </label>
+            <button class="btn btn-secondary btn-small" onclick="refreshAllUrls()">
+              <span class="emoji">🔄</span>
+              Refresh
+            </button>
+          </div>
+        </div>
+        <div id="urlList"></div>
+      </div>
 
-        if (response.ok) {
-          const data = JSON.parse(text);
-          document.getElementById("shortUrlText").innerHTML = `<a href="${data.short_url}" target="_blank">${data.short_url}</a>`;
-          resultDiv.style.display = "flex";
-        } else {
-          errorDiv.textContent = text;
+      <div class="features-section" id="features">
+        <h2 class="section-title">Why Choose Our URL Shortener?</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🚀</div>
+            <h3>Lightning Fast</h3>
+            <p>Generate short URLs instantly with our optimized backend</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3>Secure & Private</h3>
+            <p>5-click limit ensures your links don't live forever</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3>Custom Aliases</h3>
+            <p>Create memorable short URLs with custom aliases</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Click Tracking</h3>
+            <p>Monitor your URL usage with built-in analytics</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div class="stats" id="stats">
+          <span class="emoji">📊</span>
+          Loading server stats...
+        </div>
+        <div class="footer-text">
+          Made with <span class="emoji">❤️</span> using Go
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Main function to shorten URL
+      async function shortenUrl() {
+        const url = document.getElementById("urlInput").value.trim();
+        const alias = document.getElementById("aliasInput").value.trim();
+        const resultDiv = document.getElementById("result");
+        const errorDiv = document.getElementById("error");
+        const shortenBtn = document.getElementById("shortenBtn");
+        const btnText = shortenBtn.querySelector(".btn-text");
+
+        // Hide previous results
+        resultDiv.style.display = "none";
+        errorDiv.style.display = "none";
+
+        // Validate URL
+        if (!url) {
+          showError("Please enter a valid URL.");
+          return;
         }
-      } catch (err) {
-        errorDiv.textContent = "Something went wrong. Please try again.";
-      }
-    }
 
-    function copyToClipboard() {
-      const text = document.getElementById("shortUrlText").textContent;
-      navigator.clipboard.writeText(text).then(() => {
-        const btn = document.getElementById("copyBtn");
-        btn.textContent = "Copied!";
-        setTimeout(() => (btn.textContent = "Copy"), 2000);
+        // Show loading state
+        shortenBtn.disabled = true;
+        btnText.innerHTML = '<span class="spinner"></span> Shortening...';
+
+        const body = alias ? { url, alias } : { url };
+
+        try {
+          const response = await fetch("/shorten", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body)
+          });
+
+          const text = await response.text();
+
+          if (response.ok) {
+            const data = JSON.parse(text);
+            showResult(data.short_url);
+            // Clear form
+            document.getElementById("urlInput").value = "";
+            document.getElementById("aliasInput").value = "";
+          } else {
+            showError(text);
+          }
+        } catch (err) {
+          console.error("Error:", err);
+          showError("Something went wrong. Please try again.");
+        } finally {
+          // Reset button state
+          shortenBtn.disabled = false;
+          btnText.innerHTML = '<span class="emoji">🚀</span> Shorten URL';
+        }
+      }
+
+      // Function to show success result
+      function showResult(shortUrl) {
+        const resultDiv = document.getElementById("result");
+        const shortUrlText = document.getElementById("shortUrlText");
+
+        shortUrlText.innerHTML = `<a href="${shortUrl}" target="_blank">${shortUrl}</a>`;
+        resultDiv.style.display = "block";
+
+        // Scroll to result
+        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      // Function to show error
+      function showError(message) {
+        const errorDiv = document.getElementById("error");
+        const errorText = document.getElementById("errorText");
+
+        errorText.textContent = message;
+        errorDiv.style.display = "block";
+
+        // Scroll to error
+        errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      // Function to copy URL to clipboard
+      async function copyToClipboard() {
+        const text = document.getElementById("shortUrlText").textContent;
+        const copyBtn = document.getElementById("copyBtn");
+        const originalText = copyBtn.innerHTML;
+
+        try {
+          await navigator.clipboard.writeText(text);
+          copyBtn.innerHTML = '<span class="emoji">✅</span> Copied!';
+          copyBtn.style.background = '#28a745';
+
+          setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+            copyBtn.style.background = '';
+          }, 2000);
+        } catch (err) {
+          // Fallback for older browsers
+          const textArea = document.createElement('textarea');
+          textArea.value = text;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+
+          copyBtn.innerHTML = '<span class="emoji">✅</span> Copied!';
+          setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+          }, 2000);
+        }
+      }
+
+      // Function to load server stats
+      async function loadStats() {
+        try {
+          const response = await fetch('/health');
+          if (response.ok) {
+            const data = await response.json();
+            const statsDiv = document.getElementById('stats');
+            const now = new Date();
+
+            statsDiv.innerHTML = `
+              <span class="emoji">📊</span>
+              Server Status: ${data.status} - ${now.toLocaleTimeString()}
+            `;
+          }
+        } catch (err) {
+          console.log('Could not load stats:', err);
+          const statsDiv = document.getElementById('stats');
+          const now = new Date();
+          statsDiv.innerHTML = `
+            <span class="emoji">📊</span>
+            Server running - ${now.toLocaleTimeString()}
+          `;
+        }
+      }
+
+      // Function to validate URL format
+      function isValidUrl(string) {
+        try {
+          new URL(string);
+          return true;
+        } catch (_) {
+          // Try with https prefix
+          try {
+            new URL('https://' + string);
+            return true;
+          } catch (_) {
+            return false;
+          }
+        }
+      }
+
+      // Function to format URL
+      function formatUrl(url) {
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+          return 'https://' + url;
+        }
+        return url;
+      }
+
+      // Load stats when page loads
+      document.addEventListener('DOMContentLoaded', function () {
+        loadStats();
+
+        // Refresh stats every 30 seconds
+        setInterval(loadStats, 30000);
       });
-    }
-  </script>
+
+      // Add enter key support
+      document.getElementById('urlInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+          shortenUrl();
+        }
+      });
+
+      document.getElementById('aliasInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+          shortenUrl();
+        }
+      });
+
+      // Add input validation
+      document.getElementById('urlInput').addEventListener('input', function (e) {
+        const url = e.target.value.trim();
+        const shortenBtn = document.getElementById('shortenBtn');
+
+        if (url && !isValidUrl(url)) {
+          e.target.style.borderColor = '#ff6b6b';
+        } else {
+          e.target.style.borderColor = '';
+        }
+      });
+
+      // Add alias validation
+      document.getElementById('aliasInput').addEventListener('input', function (e) {
+        const alias = e.target.value.trim();
+
+        // Only allow alphanumeric characters, hyphens, and underscores
+        const validAlias = /^[a-zA-Z0-9_-]*$/.test(alias);
+
+        if (alias && !validAlias) {
+          e.target.style.borderColor = '#ff6b6b';
+        } else {
+          e.target.style.borderColor = '';
+        }
+      });
+    </script>
+  </div>
 </body>
 
 </html>

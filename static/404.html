@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>404 - URL Not Found | Go URL Shortener</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --primary-color: #007bff;
+      --primary-hover: #0056b3;
+      --secondary-color: #28a745;
+      --secondary-hover: #1e7e34;
+      --error-color: #ff6b6b;
+      --success-color: #28a745;
+      --text-primary: #333;
+      --text-secondary: #666;
+      --text-muted: #999;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8f9fa;
+      --border-color: #dee2e6;
+      --border-radius: 8px;
+      --border-radius-lg: 12px;
+      --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.2);
+      --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--gradient-primary);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    .container {
+      background: var(--bg-primary);
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+      min-height: calc(100vh - 40px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2rem 2rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .logo-icon {
+      font-size: 2rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .nav-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: var(--border-radius);
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+      background: var(--bg-secondary);
+      color: var(--primary-color);
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 2rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .error-code {
+      font-size: 8rem;
+      font-weight: 900;
+      color: var(--error-color);
+      margin: 0;
+      text-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+      animation: bounce 2s infinite;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    @keyframes bounce {
+
+      0%,
+      20%,
+      50%,
+      80%,
+      100% {
+        transform: translateY(0);
+      }
+
+      40% {
+        transform: translateY(-10px);
+      }
+
+      60% {
+        transform: translateY(-5px);
+      }
+    }
+
+    .error-title {
+      font-size: 2.5rem;
+      margin: 1rem 0;
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .error-message {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      margin: 1.5rem 0;
+      line-height: 1.6;
+    }
+
+    .error-reasons {
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 2rem auto;
+      border-left: 4px solid var(--error-color);
+      max-width: 500px;
+      text-align: left;
+    }
+
+    .error-reasons h3 {
+      margin: 0 0 1rem 0;
+      color: var(--text-primary);
+      font-size: 1.1rem;
+      text-align: center;
+    }
+
+    .error-reasons ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .error-reasons li {
+      padding: 0.5rem 0;
+      color: var(--text-secondary);
+      position: relative;
+      padding-left: 2rem;
+    }
+
+    .error-reasons li::before {
+      content: '❌';
+      position: absolute;
+      left: 0;
+      top: 0.5rem;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 2rem 0;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 12px 24px;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: var(--secondary-color);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: var(--secondary-hover);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 2px solid var(--border-color);
+    }
+
+    .btn-outline:hover {
+      background: var(--bg-secondary);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+      transform: translateY(-2px);
+    }
+
+    .fun-facts {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: var(--gradient-primary);
+      border-radius: 12px;
+      color: white;
+      font-size: 0.9rem;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .fun-facts h4 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1rem;
+    }
+
+    .footer {
+      padding: 1.5rem 2rem;
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      text-align: center;
+    }
+
+    .stats {
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .footer-text {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .emoji {
+      font-size: 1.2em;
+      margin: 0 0.2rem;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+
+      .error-code {
+        font-size: 6rem;
+      }
+
+      .error-title {
+        font-size: 2rem;
+      }
+
+      .main-content {
+        padding: 1.5rem;
+      }
+
+      .button-group {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .btn {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+      }
+
+      .error-reasons {
+        text-align: left;
+        margin: 1rem 0;
+      }
+    }
+
+    /* Spin animation for 404 code */
+    .error-code.spin {
+      animation: spin 0.5s ease-in-out;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">
+        <span class="logo-icon">🔗</span>
+        <span class="logo-text">URL Shortener</span>
+      </div>
+      <div class="nav-links">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/health" class="nav-link">Status</a>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <h1 class="error-code" onclick="spinCode()">404</h1>
+      <h2 class="error-title">Oops! URL Not Found</h2>
+
+      <p class="error-message">
+        <span class="emoji">🔍</span>
+        The short URL you're looking for doesn't exist or has expired.
+      </p>
+
+      <div class="error-reasons">
+        <h3>This might have happened because:</h3>
+        <ul>
+          <li>The URL has already been clicked 5 times and expired</li>
+          <li>The short URL was typed incorrectly</li>
+          <li>The URL was never created</li>
+          <li>The link is too old and has been cleaned up</li>
+        </ul>
+      </div>
+
+      <div class="button-group">
+        <a href="/" class="btn btn-primary">
+          <span class="emoji">🏠</span>
+          Go Home
+        </a>
+        <a href="/" class="btn btn-secondary">
+          <span class="emoji">✨</span>
+          Create New URL
+        </a>
+        <button onclick="goBack()" class="btn btn-outline">
+          <span class="emoji">⬅️</span>
+          Go Back
+        </button>
+      </div>
+
+      <div class="fun-facts">
+        <h4><span class="emoji">💡</span> Did you know?</h4>
+        <p>Our URLs are designed to be temporary with a 5-click limit to keep things clean and secure!</p>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="stats" id="stats">
+        <span class="emoji">📊</span>
+        Server running smoothly
+      </div>
+      <div class="footer-text">
+        Made with <span class="emoji">❤️</span> using Go
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function goBack() {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = '/';
+      }
+    }
+
+    function spinCode() {
+      const code = document.querySelector('.error-code');
+      code.classList.add('spin');
+      setTimeout(() => {
+        code.classList.remove('spin');
+      }, 500);
+    }
+
+    // Add some interactive fun
+    document.addEventListener('DOMContentLoaded', function () {
+      // Random fun facts
+      const funFacts = [
+        "Our URLs are designed to be temporary with a 5-click limit to keep things clean and secure!",
+        "Short URLs help reduce character count in social media posts and emails!",
+        "The first URL shortener was created in 2002 - we've come a long way since then!",
+        "Our server processes requests in milliseconds for lightning-fast redirects!",
+        "Custom aliases make your links more memorable and professional!"
+      ];
+
+      const randomFact = funFacts[Math.floor(Math.random() * funFacts.length)];
+      document.querySelector('.fun-facts p').textContent = randomFact;
+
+      // Update stats with current time
+      const now = new Date();
+      document.getElementById('stats').innerHTML = `
+        <span class="emoji">📊</span>
+        Server running smoothly - ${now.toLocaleTimeString()}
+      `;
+    });
+  </script>
+</body>
+
+</html>
