@@ -37,7 +37,6 @@ COPY --from=builder /app/url-shortener .
 
 # Copy static files and templates
 COPY --from=builder /app/static ./static
-COPY --from=builder /app/templates ./templates
 
 # Create data directory and set permissions
 RUN mkdir -p ./data && \
